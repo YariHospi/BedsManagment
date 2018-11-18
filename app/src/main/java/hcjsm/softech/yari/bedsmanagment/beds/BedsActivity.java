@@ -3,6 +3,7 @@ package hcjsm.softech.yari.bedsmanagment.beds;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -12,22 +13,38 @@ import android.view.MenuItem;
 import hcjsm.softech.yari.bedsmanagment.R;
 
 public class BedsActivity extends AppCompatActivity {
+    
+    private Toolbar     mToolbar;
+    private Fragment    mBedsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beds);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        
+        // UI References
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mBedsFragment = getSupportFragmentManager().findFragmentById(R.id.beds_container);
+        
+        
+        //Setup
+        setUpToolbar();
+        setUpBedsFragment();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+    }
+
+    private void setUpBedsFragment() {
+        if(mBedsFragment == null){
+            mBedsFragment = BedsFragment.newInstance(null,null);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.beds_container, mBedsFragment)
+                    .commit();
+        }
+    }
+
+    private void setUpToolbar() {
+        setSupportActionBar(mToolbar);
     }
 
     @Override
