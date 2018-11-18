@@ -1,4 +1,4 @@
-package hcjsm.softech.yari.bedsmanagment;
+package hcjsm.softech.yari.bedsmanagment.beds;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import hcjsm.softech.yari.bedsmanagment.R;
 
 public class BedsActivity extends AppCompatActivity {
 
