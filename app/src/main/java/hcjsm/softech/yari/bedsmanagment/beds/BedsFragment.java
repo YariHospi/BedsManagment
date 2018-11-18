@@ -2,9 +2,11 @@ package hcjsm.softech.yari.bedsmanagment.beds;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +18,14 @@ import java.util.List;
 
 import hcjsm.softech.yari.bedsmanagment.R;
 import hcjsm.softech.yari.bedsmanagment.beds.domain.model.Bed;
+import hcjsm.softech.yari.bedsmanagment.di.DependencyProvider;
 
 
 public class BedsFragment extends Fragment implements BedsMvp.View {
 
     private RecyclerView    mBedsList;
     private BedsAdapter     mBedsAdapter;
+    private BedsPresenter   mBedsPresenter;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private View mEmptyView;
@@ -45,6 +49,8 @@ public class BedsFragment extends Fragment implements BedsMvp.View {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBedsAdapter = new BedsAdapter(new ArrayList<Bed>(0),mItemListener);
+        mBedsPresenter = new BedsPresenter(DependencyProvider.provideBedsRepository(getActivity()),this);
+        setRetainInstance(true);
     }
 
     @Override
@@ -63,6 +69,14 @@ public class BedsFragment extends Fragment implements BedsMvp.View {
         setUpRefreshLayout();
 
         return root;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState){
+        super.onViewCreated(view, savedInstanceState);
+        if(savedInstanceState == null){
+            mBedsPresenter.loadBeds(false);
+        }
     }
 
     private void setUpRefreshLayout() {
@@ -128,7 +142,17 @@ public class BedsFragment extends Fragment implements BedsMvp.View {
 
     private void setUpBedsList() {
         mBedsList.setAdapter(mBedsAdapter);
-        mBedsList.setHasFixedSize(true);
+
+        final LinearLayoutManager layoutManager = (LinearLayoutManager) mBedsList.getLayoutManager();
+
+        mBedsList.addOnScrollListener(
+                new InfiniteScrollListener(mBedsAdapter,layoutManager) {
+                    @Override
+                    public void onLoadMore() {
+                        mBedsPresenter.loadBeds(false);
+                    }
+                }
+        );
     }
 
 }
