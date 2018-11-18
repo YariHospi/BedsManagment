@@ -23,7 +23,7 @@ public class BedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private BedItemListener     mItemListener;
 
 
-    public BedsAdapter(List<Bed> beds, BedItemsListener itemListener){
+    public BedsAdapter(List<Bed> beds, BedItemListener itemListener){
         setList(beds);
         mItemListener = itemListener;
     }
