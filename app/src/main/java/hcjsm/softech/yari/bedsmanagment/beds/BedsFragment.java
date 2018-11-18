@@ -9,14 +9,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import hcjsm.softech.yari.bedsmanagment.R;
 import hcjsm.softech.yari.bedsmanagment.beds.domain.model.Bed;
 
 
-public class BedsFragment extends Fragment {
+public class BedsFragment extends Fragment implements BedsMvp.View {
 
     private RecyclerView    mBedsList;
     private BedsAdapter     mBedsAdapter;
@@ -46,10 +48,10 @@ public class BedsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public android.view.View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                          Bundle savedInstanceState) {
 
-        View root = inflater.inflate(R.layout.fragment_beds,container,false);
+        android.view.View root = (android.view.View) inflater.inflate(R.layout.fragment_beds,container,false);
 
         // UI references
         mBedsList = (RecyclerView) root.findViewById(R.id.beds_list);
@@ -75,6 +77,53 @@ public class BedsFragment extends Fragment {
 
             }
         });
+    }
+
+    @Override
+    public void showBeds(List<Bed> beds){
+        mBedsAdapter.replaceData(beds);
+
+        mBedsList.setVisibility(View.VISIBLE);
+        mEmptyView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void showLoadingState(final boolean show) {
+        if(getView() == null){
+            return;
+        }
+        mSwipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefreshLayout.setRefreshing(show);
+            }
+        });
+    }
+
+    @Override
+    public void showEmptyState() {
+        mBedsList.setVisibility(View.GONE);
+        mEmptyView.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void showBedsError(String msg) {
+        Toast.makeText(getActivity(),msg,Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void showBedsPage(List<Bed> beds) {
+        mBedsAdapter.addData(beds);
+    }
+
+    @Override
+    public void showLoadMoreIndicator(boolean show) {
+
+    }
+
+    @Override
+    public void allowMoreData(boolean show) {
+
     }
 
     private void setUpBedsList() {
