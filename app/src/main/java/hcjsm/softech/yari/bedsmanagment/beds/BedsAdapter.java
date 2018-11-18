@@ -17,10 +17,16 @@ import hcjsm.softech.yari.bedsmanagment.beds.domain.model.Bed;
 
 
 
-public class BedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class BedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements IDataLoading {
 
     private List <Bed>          mBeds;
     private BedItemListener     mItemListener;
+
+    private boolean mLoading = false;
+    private boolean mMoreData = false;
+
+    private final static int TYPE_BED = 1;
+    private final static int TYPE_LOADING_MORE = 2;
 
 
     public BedsAdapter(List<Bed> beds, BedItemListener itemListener){
@@ -76,6 +82,16 @@ public class BedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     public int getDataItemCount(){
         return mBeds.size();
+    }
+
+    @Override
+    public boolean isLoadingData() {
+        return mLoading;
+    }
+
+    @Override
+    public boolean isThereMoreData() {
+        return mMoreData;
     }
 
     public class BedsHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
