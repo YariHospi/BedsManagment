@@ -1,12 +1,12 @@
 package hcjsm.softech.yari.bedsmanagment.beds;
 
 
-import android.annotation.SuppressLint;
+
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 
-import static android.support.v4.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class InfiniteScrollListener extends OnScrollListener {
 
@@ -14,7 +14,7 @@ public abstract class InfiniteScrollListener extends OnScrollListener {
     private final LinearLayoutManager mLayoutManager;
     private final IDataLoading mDataLoading;
 
-    @SuppressLint("RestrictedApi")
+
     public InfiniteScrollListener(IDataLoading dataLoading, LinearLayoutManager linearLayoutManager){
         mDataLoading = checkNotNull(dataLoading);
         mLayoutManager = checkNotNull(linearLayoutManager);
