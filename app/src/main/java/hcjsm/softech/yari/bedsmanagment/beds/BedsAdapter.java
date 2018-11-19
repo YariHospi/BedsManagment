@@ -1,13 +1,16 @@
 package hcjsm.softech.yari.bedsmanagment.beds;
 
-import android.annotation.SuppressLint;
+
 import android.content.Context;
 
-import static android.support.v4.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -34,27 +37,71 @@ public class BedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         mItemListener = itemListener;
     }
 
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View view;
 
+        if(viewType == TYPE_LOADING_MORE) {
+            view = inflater.inflate(R.layout.item_loading_footer, parent, false);
+            return new LoadingMoreHolder(view);
+        }
+
         view = inflater.inflate(R.layout.item_bed,parent,false);
         return new BedsHolder(view, mItemListener);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        if (viewHolder instanceof BedsHolder){
-            Bed bed = mBeds.get(position);
-            BedsHolder bedsHolder = (BedsHolder) viewHolder;
-            bedsHolder.code.setText(bed.getmCode());
-            bedsHolder.floor.setText(bed.getmFloor());
-            bedsHolder.room.setText(bed.getmRoom());
-            bedsHolder.status.setText(bed.getmStatus());
+    public int getItemViewType(int position){
+        if(position < getDataItemCount() && getDataItemCount() > 0 ){
+            return TYPE_BED;
         }
+        return TYPE_LOADING_MORE;
+    }
+
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        switch (getItemViewType(position)){
+            case TYPE_BED:
+                Bed bed = mBeds.get(position);
+                BedsHolder bedsHolder = (BedsHolder) viewHolder;
+                bedsHolder.code.setText(bed.getmCode());
+                bedsHolder.floor.setText(bed.getFormatedfloor());
+                bedsHolder.room.setText(bed.getFormatedRoom());
+                bedsHolder.status.setText(bed.getmStatus());
+                break;
+            case TYPE_LOADING_MORE:
+                bindLoadingViewHolder((LoadingMoreHolder) viewHolder, position);
+                break;
+        }
+    }
+
+    private void bindLoadingViewHolder(LoadingMoreHolder viewHolder, int position) {
+        viewHolder.progress.setVisibility((position>0 && mLoading && mMoreData)
+                ? View.VISIBLE: View.INVISIBLE);
+    }
+
+    public void dataStartedLoading() {
+        if (mLoading) return;
+        mLoading = true;
+       notifyItemInserted(getLoadingMoreItemPosition());
+
+    }
+
+    public void dataFinishedLoading() {
+        if (!mLoading) return;
+        mLoading = false;
+        notifyItemRemoved(getLoadingMoreItemPosition());
+
+    }
+
+    public void setMoreData(boolean more) {
+        mMoreData = more;
+    }
+    private int getLoadingMoreItemPosition(){
+        return mLoading ? getItemCount() - 1 : RecyclerView.NO_POSITION;
     }
 
     public void replaceData(List<Bed> notes){
@@ -62,7 +109,7 @@ public class BedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         notifyDataSetChanged();
     }
 
-    @SuppressLint("RestrictedApi")
+
     public void setList(List<Bed> notes){
         mBeds = checkNotNull(notes);
     }
@@ -94,7 +141,7 @@ public class BedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
         return mMoreData;
     }
 
-    public class BedsHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class BedsHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         public TextView     code;
         public TextView     floor;
@@ -117,6 +164,15 @@ public class BedsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> i
             int position = getAdapterPosition();
             Bed bed = getItem(position);
             mItemListener.onBedClick(bed);
+        }
+    }
+
+    private class LoadingMoreHolder extends RecyclerView.ViewHolder {
+        public ProgressBar progress;
+
+        public LoadingMoreHolder(View view) {
+            super(view);
+            progress = (ProgressBar) view.findViewById(R.id.progressBar);
         }
     }
 

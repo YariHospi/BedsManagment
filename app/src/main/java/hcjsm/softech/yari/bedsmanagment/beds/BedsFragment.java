@@ -132,11 +132,17 @@ public class BedsFragment extends Fragment implements BedsMvp.View {
 
     @Override
     public void showLoadMoreIndicator(boolean show) {
+        if(!show){
+            mBedsAdapter.dataFinishedLoading();
+        }else {
+            mBedsAdapter.dataStartedLoading();
+        }
 
     }
 
     @Override
-    public void allowMoreData(boolean show) {
+    public void allowMoreData(boolean allow) {
+        mBedsAdapter.setMoreData(allow);
 
     }
 

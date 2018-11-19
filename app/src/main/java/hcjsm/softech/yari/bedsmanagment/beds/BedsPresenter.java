@@ -1,32 +1,34 @@
 package hcjsm.softech.yari.bedsmanagment.beds;
 
-import android.annotation.SuppressLint;
+
 
 import java.util.List;
 
+import hcjsm.softech.yari.bedsmanagment.beds.domain.criteria.IBedCriteria;
+import hcjsm.softech.yari.bedsmanagment.beds.domain.criteria.PagingBedCriteria;
 import hcjsm.softech.yari.bedsmanagment.beds.domain.model.Bed;
 import hcjsm.softech.yari.bedsmanagment.data.beds.BedsRepository;
 
-import static android.support.v4.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BedsPresenter implements BedsMvp.Presenter {
 
     private final BedsRepository    mBedsRepository;
     private final BedsMvp.View      mBedsView;
 
-    public static final int PRODUCTS_LIMIT = 20;
+    public static final int PRODUCTS_LIMIT = 5;
 
     private boolean isFirstLoad = true;
     private int mCurrentPage = 1;
 
-    @SuppressLint("RestrictedApi")
+
     public BedsPresenter (BedsRepository bedsRepository, BedsMvp.View bedsView){
         mBedsRepository = checkNotNull(bedsRepository);
         mBedsView = checkNotNull(bedsView);
     }
 
     @Override
-    public void loadBeds(boolean reload) {
+    public void loadBeds(final boolean reload) {
         final boolean reallyReload = reload || isFirstLoad;
 
         if(reallyReload){
@@ -37,14 +39,16 @@ public class BedsPresenter implements BedsMvp.Presenter {
             mBedsView.showLoadMoreIndicator(true);
             mCurrentPage++;
         }
+
+        IBedCriteria criteria = new PagingBedCriteria(mCurrentPage, PRODUCTS_LIMIT );
+
         mBedsRepository.getBeds(
                 new BedsRepository.GetBedsCallback() {
                     @Override
                     public void onBedsLoaded(List<Bed> beds) {
                         mBedsView.showLoadingState(false);
                         processBeds(beds, reallyReload);
-
-                        isFirstLoad = false;
+                        isFirstLoad=false;
                     }
 
                     @Override
@@ -53,7 +57,7 @@ public class BedsPresenter implements BedsMvp.Presenter {
                         mBedsView.showLoadMoreIndicator(false);
                         mBedsView.showBedsError(error);
                     }
-                });
+                },criteria);
     }
 
     private void processBeds(List<Bed> beds, boolean reload) {
