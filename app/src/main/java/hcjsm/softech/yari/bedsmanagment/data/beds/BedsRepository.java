@@ -1,17 +1,18 @@
 package hcjsm.softech.yari.bedsmanagment.data.beds;
 
-import android.annotation.SuppressLint;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import java.util.List;
 
+import hcjsm.softech.yari.bedsmanagment.beds.domain.criteria.IBedCriteria;
 import hcjsm.softech.yari.bedsmanagment.beds.domain.model.Bed;
 import hcjsm.softech.yari.bedsmanagment.data.beds.datasource.cloud.ICloudBedsDataSource;
 import hcjsm.softech.yari.bedsmanagment.data.beds.datasource.memory.IMemoryBedsDataSource;
 
-import static android.support.v4.util.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BedsRepository implements IBedsRepository {
 
@@ -21,7 +22,7 @@ public class BedsRepository implements IBedsRepository {
 
     private boolean mReload;
 
-    @SuppressLint("RestrictedApi")
+
     public BedsRepository(IMemoryBedsDataSource memoryDataSource, ICloudBedsDataSource
                           cloudDataSource, Context context){
         mMemoryBedsDataSource = checkNotNull(memoryDataSource);
@@ -30,24 +31,24 @@ public class BedsRepository implements IBedsRepository {
     }
 
     @Override
-    public void getBeds(GetBedsCallback callback) {
+    public void getBeds(final GetBedsCallback callback, final IBedCriteria criteria) {
         if(!mMemoryBedsDataSource.mapIsNull() && !mReload){
-            getBedsFromMemory(callback);
+            getBedsFromMemory(callback,criteria);
             return;
         }
         if(mReload){
             getBedsFromServer(callback, criteria);
         }else {
-            List<Bed> beds = mMemoryBedsDataSource.find();
+            List<Bed> beds = mMemoryBedsDataSource.find(criteria);
             if(beds.size()>0){
                 callback.onBedsLoaded(beds);
             }else {
-                getBedsFromServer(callback);
+                getBedsFromServer(callback,criteria);
             }
         }
     }
 
-    private void getBedsFromServer(final GetBedsCallback callback) {
+    private void getBedsFromServer(final GetBedsCallback callback, final IBedCriteria criteria) {
         if(!isOnline()){
             callback.onDataNotAvailable("No hay conexion de red");
             return;
@@ -57,7 +58,7 @@ public class BedsRepository implements IBedsRepository {
                     @Override
                     public void onLoaded(List<Bed> beds) {
                         refreshMemoryDataSource(beds);
-                        getBedsFromMemory(callback);
+                        getBedsFromMemory(callback,criteria);
                     }
 
                     @Override
@@ -72,7 +73,7 @@ public class BedsRepository implements IBedsRepository {
     private boolean isOnline(){
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
-        return info != null && info.isConnected();
+        return info != null && info.isConnectedOrConnecting();
     }
 
     private void refreshMemoryDataSource(List<Bed> beds){
@@ -82,8 +83,8 @@ public class BedsRepository implements IBedsRepository {
         }
         mReload = false;
     }
-    private void getBedsFromMemory(GetBedsCallback callback) {
-        callback.onBedsLoaded(mMemoryBedsDataSource.find());
+    private void getBedsFromMemory(GetBedsCallback callback, IBedCriteria criteria) {
+        callback.onBedsLoaded(mMemoryBedsDataSource.find(criteria));
     }
 
 
