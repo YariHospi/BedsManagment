@@ -1,12 +1,25 @@
 package hcjsm.softech.yari.bedsmanagment.beds.domain.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Bed {
 
+    @SerializedName("code")
     private String mCode;
+
+    @SerializedName("floor")
     private int mFloor;
+
+    @SerializedName("room")
     private int mRoom;
+
+    @SerializedName("description")
     private String mDescription;
+
+    @SerializedName("patient")
     private String mPatientName;
+
+    @SerializedName("status")
     private String mStatus;
 
     public Bed (String code, int floor, int room ){

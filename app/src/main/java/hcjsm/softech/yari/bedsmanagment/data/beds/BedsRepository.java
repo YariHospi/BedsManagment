@@ -64,10 +64,8 @@ public class BedsRepository implements IBedsRepository {
                     @Override
                     public void onError(String error) {
                         callback.onDataNotAvailable(error);
-
                     }
-                }
-        );
+                },null);
     }
 
     private boolean isOnline(){
