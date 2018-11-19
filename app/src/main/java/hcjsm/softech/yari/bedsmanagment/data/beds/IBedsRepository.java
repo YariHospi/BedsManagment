@@ -2,6 +2,7 @@ package hcjsm.softech.yari.bedsmanagment.data.beds;
 
 import java.util.List;
 
+import hcjsm.softech.yari.bedsmanagment.beds.domain.criteria.IBedCriteria;
 import hcjsm.softech.yari.bedsmanagment.beds.domain.model.Bed;
 
 public interface IBedsRepository {
@@ -9,6 +10,6 @@ public interface IBedsRepository {
         void onBedsLoaded(List<Bed> beds);
         void onDataNotAvailable(String error);
     }
-    void getBeds(GetBedsCallback callback);
+    void getBeds(GetBedsCallback callback, IBedCriteria criteria);
     void refreshBeds();
 }
