@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import com.google.common.collect.Lists;
+import android.support.test.espresso.core.internal.deps.guava.collect.Lists;
 
+import hcjsm.softech.yari.bedsmanagment.beds.domain.criteria.IBedCriteria;
 import hcjsm.softech.yari.bedsmanagment.beds.domain.model.Bed;
 
 public class MemoryBedsDataSource implements IMemoryBedsDataSource {
@@ -13,9 +14,9 @@ public class MemoryBedsDataSource implements IMemoryBedsDataSource {
     private static HashMap<String, Bed> mCachedBeds;
 
     @Override
-    public List<Bed> find(BedCriteria criteria) {
+    public List<Bed> find(IBedCriteria criteria) {
         ArrayList<Bed> beds = Lists.newArrayList(mCachedBeds.values());
-        return beds;
+        return criteria.match(beds);
     }
 
     @Override
