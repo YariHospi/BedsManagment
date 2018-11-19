@@ -64,4 +64,10 @@ public class Bed {
     public void setmStatus(String mStatus) {
         this.mStatus = mStatus;
     }
+    public String getFormatedfloor() {
+        return String.format("Piso: ", mFloor);
+    }
+    public String getFormatedRoom(){
+        return String.format("Sala: ",mRoom);
+    }
 }
